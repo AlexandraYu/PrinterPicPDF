@@ -11,6 +11,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -26,6 +27,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class DisplayPDF extends Activity {
+	private static final String PATH_PRIFIX = "/Android/data";
 	private Context context; 
 	private ArrayList<PDFFileInfo> pdfFileList;	 
 	private ListView listView;
@@ -95,6 +97,14 @@ public class DisplayPDF extends Activity {
 		});
 	}
 	
+	public boolean forbiddenPath(String path) {
+		String pathFilter=Environment.getExternalStorageDirectory().getAbsolutePath() + PATH_PRIFIX;
+		Log.d("Alex", "pathFilter is "+pathFilter); 
+		if (path.startsWith(pathFilter)) return true;
+		else 
+			return false;
+	}
+	
 	public void getPDFfiles() {
 		ContentResolver pdfFileResolver = context.getContentResolver();
 		Uri uri = MediaStore.Files.getContentUri("external");
@@ -126,7 +136,8 @@ public class DisplayPDF extends Activity {
 				Log.d("Alex", "thisName is: "+thisName);
 				Log.d("Alex", "thisSize is: "+thisSize);
 				Log.d("Alex", "thisPath is: "+thisPath);
-				pdfFileList.add(new PDFFileInfo(thisName, thisSize, thisPath));
+				if (!forbiddenPath(thisPath)) 
+					pdfFileList.add(new PDFFileInfo(thisName, thisSize, thisPath));
 			}
 			while (pdfFileCr.moveToNext());
 				Log.d("Alex", "pdfFileList size is: "+pdfFileList.size());
