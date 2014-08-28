@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Printer</string>
+    <string name="show_pdf">Display PDF file</string>
+    <string name="show_pic">Display picture file</string>
+    <string name="no_pic_found">No picture found!</string>
+    <string name="no_pdf_found">No PDF file found!</string>
+    <string name="action_print">Print</string>
+    <string name="image_description">An image here</string>
+    <string name="progress_dialog_title">Loading...</string>
+    <string name="progress_dialog_content">Please wait while loading...</string>
+
+</resources>
