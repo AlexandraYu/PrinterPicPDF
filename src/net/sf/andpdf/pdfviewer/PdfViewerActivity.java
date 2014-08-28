@@ -127,7 +127,7 @@ public abstract class PdfViewerActivity extends Activity {
     private Thread backgroundThread;
     private Handler uiHandler;
 
-    public void printDocument1(View view) {
+    public void printDocument(View view) {
 	    PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
 //	    jobName = getString(R.string.app_name) + " Document"; 
 	    printManager.print(jobName, new MyPrintDocumentAdapter(this.context), null);
@@ -226,17 +226,31 @@ public abstract class PdfViewerActivity extends Activity {
 			int titleBaseLine = 15;
 			int leftMargin = 10;
 			pagenumber++; // Make sure page numbers start at 1
-			try {
-				showPage(pagenumber, STARTZOOM);
-			} catch (Exception e) {
+//			try {
+//				showPage(pagenumber, STARTZOOM);
+//			} catch (Exception e) {
 				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			Paint paint = new Paint();
-		    paint.setColor(Color.BLACK);
-		    paint.setTextSize(14);
+//				e.printStackTrace();
+//			}
+			myBitmap=loadPage(pagenumber); 
+//			Paint paint = new Paint();
+//		    paint.setColor(Color.BLACK);
+//		    paint.setTextSize(14);
 			canvas.drawBitmap(myBitmap, leftMargin, titleBaseLine, null);
 		}
+		
+		private Bitmap loadPage(int pageNumber) {
+	    	Log.d("Alex", "in loadPage, page number is: "+pageNumber); 
+		        if (pageNumber<=0) pageNumber=1; 
+
+		        PDFPage myPdfPage = mPdfFile.getPage(pageNumber, true);
+
+		        float width = myPdfPage.getWidth();
+		        float height = myPdfPage.getHeight();
+		        RectF clip = null;
+		        Bitmap bitmap = myPdfPage.getImage((int)(width*STARTZOOM), (int)(height*STARTZOOM), clip, true, true);
+		        return bitmap; 
+	    }
 
 	}
 
@@ -486,16 +500,17 @@ public abstract class PdfViewerActivity extends Activity {
             break;
     	}
     	case MENU_PRINT: {
-    		printDocument1(mGraphView); 
-//    		printDocument(); 
+    		printDocument(mGraphView); 
+//    		printDocumentOneByOne(); 
     		break; 
     	}
     	}
     	return true;
     }
     
-    
-    private void printDocument() {
+
+    //This, if called instead of printDocument, will print out only one document that's shown on the screen
+    private void printDocumentOneByOne() {
 		// TODO Auto-generated method stub
     	PrintHelper photoPrinter = new PrintHelper(context);
 		photoPrinter.setScaleMode(PrintHelper.SCALE_MODE_FIT);
@@ -947,7 +962,7 @@ public abstract class PdfViewerActivity extends Activity {
 	        RectF clip = null;
 	        //middleTime = System.currentTimeMillis();
 	        Bitmap bi = mPdfPage.getImage((int)(width*zoom), (int)(height*zoom), clip, true, true);
-	        myBitmap = bi; 
+//	        myBitmap = bi; 
 	        mGraphView.setPageBitmap(bi);
 	        mGraphView.updateImage();
 	        
