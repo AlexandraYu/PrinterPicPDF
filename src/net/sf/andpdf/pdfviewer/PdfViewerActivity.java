@@ -45,6 +45,7 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,6 +58,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.printer.R;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFImage;
 import com.sun.pdfview.PDFPage;
@@ -127,7 +129,7 @@ public abstract class PdfViewerActivity extends Activity {
     private Thread backgroundThread;
     private Handler uiHandler;
 
-    public void printDocument(View view) {
+    public void printDocument() {
 	    PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
 //	    jobName = getString(R.string.app_name) + " Document"; 
 	    printManager.print(jobName, new MyPrintDocumentAdapter(this.context), null);
@@ -450,7 +452,8 @@ public abstract class PdfViewerActivity extends Activity {
 
 	
 	@Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(Menu menu) { 
+		/*
         super.onCreateOptionsMenu(menu);
         menu.add(Menu.NONE, MENU_PREV_PAGE, Menu.NONE, "Previous Page").setIcon(getPreviousPageImageResource());
         menu.add(Menu.NONE, MENU_NEXT_PAGE, Menu.NONE, "Next Page").setIcon(getNextPageImageResource());
@@ -460,8 +463,10 @@ public abstract class PdfViewerActivity extends Activity {
         menu.add(Menu.NONE, MENU_PRINT, Menu.NONE, "Print").setIcon(getZoomInImageResource());
         if (HardReference.sKeepCaches)
             menu.add(Menu.NONE, MENU_CLEANUP, Menu.NONE, "Clear Caches");
-        	
-        return true;
+        */
+		MenuInflater inflater = getMenuInflater();
+	    inflater.inflate(R.menu.main, menu);
+	    return super.onCreateOptionsMenu(menu);
     }
     
     /**
@@ -471,6 +476,7 @@ public abstract class PdfViewerActivity extends Activity {
     public boolean onOptionsItemSelected(MenuItem item) {
         super.onOptionsItemSelected(item);
     	switch (item.getItemId()) {
+    	/*
     	case MENU_NEXT_PAGE: {
     		nextPage();
     		break;
@@ -503,9 +509,14 @@ public abstract class PdfViewerActivity extends Activity {
     		printDocument(mGraphView); 
 //    		printDocumentOneByOne(); 
     		break; 
+    	} */
+    	case R.id.action_print:
+    		printDocument(); 
+    		return true; 
+    		
+    	default:
+            return super.onOptionsItemSelected(item);
     	}
-    	}
-    	return true;
     }
     
 
