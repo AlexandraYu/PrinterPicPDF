@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
+import com.example.printer.DisplayPic.ShowPictureList;
+
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -12,6 +15,8 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,7 +37,10 @@ public class DisplayPDF extends Activity {
 	private ArrayList<PDFFileInfo> pdfFileList;	 
 	private ListView listView;
 	private final int MENU_LIST1 = Menu.FIRST; 	 /* menu parameters*/
-	private final String START_PDF_VIEWER_INTENT="com.example.printer.VIEW_MY_PDF"; 
+	private final String START_PDF_VIEWER_INTENT="com.example.printer.VIEW_MY_PDF";
+	private final int UPDATE_STATUS_COMPLETE=2000;
+	private ProgressDialog progressDialog;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -70,15 +78,25 @@ public class DisplayPDF extends Activity {
 	
 	protected void onResume() {
 		super.onResume();
-		pdfFileList.clear(); 
-		getPDFfiles();
-		Collections.sort(pdfFileList, new Comparator<PDFFileInfo>() {
+		pdfFileList.clear();
+		progressDialog = ProgressDialog.show(context, getString(R.string.progress_dialog_title), getString(R.string.progress_dialog_content), false); //since it might take a while for info to load
+//		getPDFfiles();
+		ShowPDFList showPDFList = new ShowPDFList(); 
+		new Thread(showPDFList). start();
+		/*Collections.sort(pdfFileList, new Comparator<PDFFileInfo>() {
 			public int compare(PDFFileInfo a, PDFFileInfo b){
 				return a.getName().compareTo(b.getName()); 
 			}
-		});
+		});*/
 		listView.setAdapter(new PDFFileListAdapter(context, pdfFileList));
 		clickItem(listView); 
+	}
+	
+	public class ShowPDFList implements Runnable {
+		public void run() {
+			Log.d("Alex", "will call getPDFFiles!"); 
+			getPDFfiles(handler);
+		}
 	}
 	
 	public void clickItem(ListView currentView) {
@@ -105,7 +123,7 @@ public class DisplayPDF extends Activity {
 			return false;
 	}
 	
-	public void getPDFfiles() {
+	public void getPDFfiles(Handler h) {
 		ContentResolver pdfFileResolver = context.getContentResolver();
 		Uri uri = MediaStore.Files.getContentUri("external");
 
@@ -142,6 +160,8 @@ public class DisplayPDF extends Activity {
 			while (pdfFileCr.moveToNext());
 				Log.d("Alex", "pdfFileList size is: "+pdfFileList.size());
 			}
+		Message message = h.obtainMessage(UPDATE_STATUS_COMPLETE);
+		h.sendMessage(message);
 	}
 	
 	public class PDFFileListAdapter extends BaseAdapter {
@@ -210,5 +230,22 @@ public class DisplayPDF extends Activity {
 		TextView fileSize; 
 	}
 	
+	private Handler handler = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+				case UPDATE_STATUS_COMPLETE:
+					Log.d("Alex", "Am I HERE??"); 
+					Collections.sort(pdfFileList, new Comparator<PDFFileInfo>() {
+						public int compare(PDFFileInfo a, PDFFileInfo b){
+							return a.getName().compareTo(b.getName()); 
+						}
+					});
+					((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
+					progressDialog.dismiss(); //info loaded ready, progress dialog can be dismissed.
+					break;
+			}
+		}
+	};
 }
 
