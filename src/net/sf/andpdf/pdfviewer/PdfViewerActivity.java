@@ -53,11 +53,13 @@ import android.view.View.OnClickListener;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import com.example.printer.PopupPicker;
 import com.example.printer.R;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFImage;
@@ -118,6 +120,7 @@ public abstract class PdfViewerActivity extends Activity {
     private Context context; 
     private String jobName; 
     private int totalpages; 
+    private MenuItem printKey; 
 
     /*private View navigationPanel;
     private Handler closeNavigationHandler;
@@ -130,9 +133,14 @@ public abstract class PdfViewerActivity extends Activity {
     private Handler uiHandler;
 
     public void printDocument() {
+    	/*
 	    PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
 //	    jobName = getString(R.string.app_name) + " Document"; 
 	    printManager.print(jobName, new MyPrintDocumentAdapter(this.context), null);
+	    */
+    	PopupPicker popupPicker = new PopupPicker(context, printKey, jobName, null);
+    	popupPicker.popup();
+    	printKey.setEnabled(false);
 	}
     
     public class MyPrintDocumentAdapter extends PrintDocumentAdapter {
@@ -466,6 +474,7 @@ public abstract class PdfViewerActivity extends Activity {
         */
 		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.main, menu);
+	    printKey = menu.getItem(0);
 	    return super.onCreateOptionsMenu(menu);
     }
     
@@ -675,12 +684,13 @@ public abstract class PdfViewerActivity extends Activity {
         
         public GraphView(Context context) {
             super(context);
+            Log.d("Alex", "in GraphView"); 
 
             //setContentView(R.layout.graphics_view);
             // layout params
 			LinearLayout.LayoutParams lpWrap1 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,1);
 			LinearLayout.LayoutParams lpWrap10 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,10);
-
+			 
             // vertical layout
 			LinearLayout vl=new LinearLayout(context);
 			vl.setLayoutParams(lpWrap10);
@@ -758,7 +768,7 @@ public abstract class PdfViewerActivity extends Activity {
         }
 
         private void addNavButtons(ViewGroup vg) {
-        	
+        	Log.d("Alex", "in addNavButtons"); 
 	        addSpace(vg, 6, 6);
 	        
 			LinearLayout.LayoutParams lpChild1 = new LinearLayout.LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT,1);

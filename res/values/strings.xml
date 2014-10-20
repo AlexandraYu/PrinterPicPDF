@@ -10,5 +10,6 @@
     <string name="image_description">An image here</string>
     <string name="progress_dialog_title">Loading...</string>
     <string name="progress_dialog_content">Please wait while loading...</string>
+    <string name="picker_title">Print %s copies!</string>
 
 </resources>

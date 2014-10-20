@@ -17,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
@@ -24,14 +25,16 @@ public class PicViewer extends Activity {
 	private ImageView imageView;
 	private String filePath;
 	private String fileName; 
-//	private Button button; 
+	private MenuItem printKey; 
 	private Context context;
 	private Bitmap bMap;
+	private FrameLayout frameLayout; 
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.pic_viewer_layout);
-		
+		frameLayout = (FrameLayout) findViewById(R.id.pic_viewer);
+		frameLayout.getForeground().setAlpha(0);
 		context=this; 		
 		imageView = (ImageView) findViewById(R.id.image);
 //		button = (Button) findViewById(R.id.bt_print);
@@ -41,7 +44,7 @@ public class PicViewer extends Activity {
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
- 
+        printKey = menu.getItem(0);
         return super.onCreateOptionsMenu(menu);
     }
 	
@@ -67,8 +70,7 @@ public class PicViewer extends Activity {
 		filePath=receivedIntent.getStringExtra("file_path"); 
 		fileName=receivedIntent.getStringExtra("file_name"); 
 		bMap = BitmapFactory.decodeFile(filePath);
-		if(bMap!=null) 
-		{ 
+		if(bMap!=null) { 
 			imageView.setImageBitmap(bMap);
 		}
 		else Toast.makeText(context, "Error!", Toast.LENGTH_SHORT).show();
@@ -83,11 +85,17 @@ public class PicViewer extends Activity {
 	}
 	
 	public void printPicture() {
+		/*
 		PrintHelper photoPrinter = new PrintHelper(context);
 		photoPrinter.setScaleMode(PrintHelper.SCALE_MODE_FIT);
 	    Log.d("Alex", "color? "+photoPrinter.getColorMode()); 
 	    Log.d("Alex", "orientation? "+photoPrinter.getOrientation());
-	    photoPrinter.printBitmap(fileName, bMap);
+	    photoPrinter.printBitmap(fileName, bMap); 
+	    */
+		frameLayout.getForeground().setAlpha(200); //dim
+		PopupPicker popupPicker = new PopupPicker(context, printKey, filePath, frameLayout);
+		popupPicker.popup();
+		printKey.setEnabled(false); 
 	}
 	
 }
