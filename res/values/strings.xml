@@ -11,5 +11,9 @@
     <string name="progress_dialog_title">Loading...</string>
     <string name="progress_dialog_content">Please wait while loading...</string>
     <string name="picker_title">Print %s copies!</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+    <string name="print_copy_title">Print...</string>
+    <string name="print_copy_instruction">Choose how many copies to print: </string>
 
 </resources>

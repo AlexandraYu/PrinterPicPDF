@@ -36,7 +36,7 @@ public class PopupPicker {
 		LayoutInflater layoutInflater = (LayoutInflater)context.getSystemService(context.LAYOUT_INFLATER_SERVICE);  
 	    View popupView = layoutInflater.inflate(R.layout.popup, null); 
 	    final PopupWindow popupWindow = new PopupWindow(popupView, LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);  
-	    textView=(TextView) popupView.findViewById(R.id.textView);
+//	    textView=(TextView) popupView.findViewById(R.id.textView);
 	       
         numPicker=(NumberPicker) popupView.findViewById(R.id.numberPicker);
         numPicker.setMaxValue(9);  
@@ -57,7 +57,7 @@ public class PopupPicker {
                
              }
         });
-	    Button btnDismiss = (Button)popupView.findViewById(R.id.dismiss);
+/*	    Button btnDismiss = (Button)popupView.findViewById(R.id.dismiss);
 	    btnDismiss.setOnClickListener(new Button.OnClickListener(){
 	    	@Override
 	    	public void onClick(View v) {
@@ -81,7 +81,7 @@ public class PopupPicker {
 	    		menuItem.setEnabled(true); 
 	    		popupWindow.dismiss();
 	    	}
-	    });           
+	    });  */         
 	    popupWindow.showAtLocation(popupView, DEFAULT_COPY, 50, -30);
 	}
 

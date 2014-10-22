@@ -57,7 +57,9 @@ import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.NumberPicker;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.printer.PopupPicker;
 import com.example.printer.R;
@@ -120,7 +122,11 @@ public abstract class PdfViewerActivity extends Activity {
     private Context context; 
     private String jobName; 
     private int totalpages; 
-    private MenuItem printKey; 
+    private int copy = -1; 
+    private NumberPicker numPicker; 
+    private static final int MIN_CHOICE = 1; 
+    private static final int MAX_CHOICE = 9; 
+//    private MenuItem printKey; 
 
     /*private View navigationPanel;
     private Handler closeNavigationHandler;
@@ -138,9 +144,50 @@ public abstract class PdfViewerActivity extends Activity {
 //	    jobName = getString(R.string.app_name) + " Document"; 
 	    printManager.print(jobName, new MyPrintDocumentAdapter(this.context), null);
 	    */
+    	/*
     	PopupPicker popupPicker = new PopupPicker(context, printKey, jobName, null);
     	popupPicker.popup();
     	printKey.setEnabled(false);
+    	*/
+    	LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+		View npView = inflater.inflate(R.layout.popup, null);
+		numPicker=(NumberPicker) npView.findViewById(R.id.numberPicker);
+        numPicker.setMaxValue(MAX_CHOICE);  
+        numPicker.setMinValue(MIN_CHOICE);    
+        numPicker.setValue(MIN_CHOICE); 
+        numPicker.setOnValueChangedListener(new NumberPicker.OnValueChangeListener () {
+        	public void onValueChange(NumberPicker view, int oldValue, int newValue) {
+        		Log.d("Alex", "newValue is: "+newValue); 
+        		
+        		if (newValue<1)
+        			newValue = 1; 
+        		copy = newValue; 
+        	}
+        });
+		AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(context);
+		alertDialogBuilder.setTitle(R.string.print_copy_title);
+		alertDialogBuilder
+			.setMessage(R.string.print_copy_instruction)
+			.setCancelable(false)
+			.setView(npView)
+			.setPositiveButton(R.string.dialog_ok,new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,int id) {
+					if (copy<0)
+						copy=1; 
+					Toast.makeText(context, "Print out "+String.valueOf(copy)+" copies", Toast.LENGTH_SHORT).show(); 
+					//TODO: send copy to print......
+					copy=-1; 
+					dialog.cancel();
+				}
+			})
+			.setNegativeButton(R.string.dialog_cancel,new DialogInterface.OnClickListener() {
+				public void onClick(DialogInterface dialog,int id) {
+					copy=-1; 
+					dialog.cancel();
+				}
+			});
+		AlertDialog alertDialog = alertDialogBuilder.create();
+		alertDialog.show();
 	}
     
     public class MyPrintDocumentAdapter extends PrintDocumentAdapter {
@@ -474,7 +521,7 @@ public abstract class PdfViewerActivity extends Activity {
         */
 		MenuInflater inflater = getMenuInflater();
 	    inflater.inflate(R.menu.main, menu);
-	    printKey = menu.getItem(0);
+//	    printKey = menu.getItem(0);
 	    return super.onCreateOptionsMenu(menu);
     }
     
