@@ -27,16 +27,17 @@ import android.util.Log;
 public class Print {
 	private Context context; 
 	private int quantity;
+	private String filePath; 
 	private byte[] totalPrintJobByte; 
-	private String urlStr="http://192.168.0.100:631"; 
-	private String urlLocStr="http://192.168.0.100:631/USB1_LQ"; 
+	private String urlStr="http://192.168.0.101:631"; 
+	private String urlLocStr="http://192.168.0.101:631/USB1_LQ";
 	
 	public byte[] intToByteArray(int value) {
 	    return new byte[] {
-	    		(byte)(value >> 24),
-	            (byte)(value >> 16),
-	            (byte)(value >> 8),
-	            (byte)value};
+	    		(byte)((value >>> 24) & 0xff),
+	            (byte)((value >>> 16) & 0xff),
+	            (byte)((value >>> 8) & 0xff),
+	            (byte)(value & 0xff)};
 	}
 	
 	private byte[] printerAttriByte= new byte[] {
@@ -201,13 +202,13 @@ public class Print {
 				//copies: 1
 				0x21, //Tag: Integer
 				0x00, 0x06, //Name length: 6
-				0x63, 0x6f, 0x70, 0x69, 0x65, 0x73, //Name: copies
-				0x00, 0x04, //Value length: 4
-				0x00, 0x00, 0x00, 0x01, //Value: 1 ******************* 122~125
+				0x63, 0x6f, 0x70, 0x69, 0x65, 0x73, //Name: copies //214~218
+				0x00, 0x04, //Value length: 4 //219~220
+				0x00, 0x00, 0x00, 0x01, //Value: 1 ******************* 221~224
 				//media-col: 
-				0x34, //Tag: Reserved (0x34)
-				0x00, 0x09, //Name length: 9
-				0x6d, 0x65, 0x64, 0x69, 0x61, 0x2d, 0x63, 0x6f, 0x6c, //Name: media-col
+				0x34, //Tag: Reserved (0x34) //225
+				0x00, 0x09, //Name length: 9 //226~227
+				0x6d, 0x65, 0x64, 0x69, 0x61, 0x2d, 0x63, 0x6f, 0x6c, //Name: media-col //228~
 				0x00, 0x00, //Value length: 0
 				//Value: 
 				0x4a, //Tag: Reserved (0x4a)
@@ -418,57 +419,64 @@ public class Print {
 				0x03 //End of attributes			
 			};
 			
-	public Print(Context c, int copy) {
+	public Print(Context c, int copy, String path) {
 		context = c; 
 		quantity = copy; 
+		filePath = path; 
 	}
 	
 	public void runPrintJobProcess() {
+		Log.d("Alex", "quantity is: "+quantity); 
 		byte[] quantityArray = intToByteArray(quantity);
+		
 		int j=0;
 		for(int i=0; i<4; i++) { 
-			printJobByte[122+j] = quantityArray[i]; 
+			printJobByte[221+j] = quantityArray[i]; 
 			j++; 
-		}
-			File externalStorage = Environment.getExternalStorageDirectory();
-			String fileDir = externalStorage.getAbsolutePath()+"/Download/cat.jpg";
-			File file = new File(fileDir); 
-			byte[] fileByte = convertFileToByte(file); 
-			totalPrintJobByte = new byte[printJobByte.length+fileByte.length];
-			System.arraycopy(printJobByte, 0, totalPrintJobByte, 0, printJobByte.length);
-			System.arraycopy(fileByte, 0, totalPrintJobByte, printJobByte.length, fileByte.length);
-			Thread threadSendPrintJob =new Thread(sendPrintJob); 
-			threadSendPrintJob.start();
+		} 
+		Log.d("Alex", "quantityArray is: "+quantityArray[0]);
+		Log.d("Alex", "quantityArray is: "+quantityArray[1]);
+		Log.d("Alex", "quantityArray is: "+quantityArray[2]);
+		Log.d("Alex", "quantityArray is: "+quantityArray[3]); 
+
+		Log.d("Alex", "printJobByte[218] is: "+printJobByte[218]);
+		Log.d("Alex", "printJobByte[219] is: "+printJobByte[219]);
+		Log.d("Alex", "printJobByte[220] is: "+printJobByte[220]);
+		Log.d("Alex", "printJobByte[221] is: "+printJobByte[221]);
+		Log.d("Alex", "printJobByte[222] is: "+printJobByte[222]); 
+		Log.d("Alex", "printJobByte[223] is: "+printJobByte[223]); 
+		Log.d("Alex", "printJobByte[224] is: "+printJobByte[224]); 
+		Log.d("Alex", "printJobByte[225] is: "+printJobByte[225]);
+		Log.d("Alex", "printJobByte[226] is: "+printJobByte[226]);
+		Log.d("Alex", "printJobByte[227] is: "+printJobByte[227]);
+		Log.d("Alex", "printJobByte[228] is: "+printJobByte[228]);
+
+		File file = new File(filePath);
+		Log.d("Alex", "filePath is: "+filePath);
+		Log.d("Alex", "file is: "+file); 
+		byte[] fileByte = convertFileToByte(file); 
+		totalPrintJobByte = new byte[printJobByte.length+fileByte.length];
+		System.arraycopy(printJobByte, 0, totalPrintJobByte, 0, printJobByte.length);
+		System.arraycopy(fileByte, 0, totalPrintJobByte, printJobByte.length, fileByte.length);
+		Thread threadSendPrintJob =new Thread(sendPrintJob); 
+		threadSendPrintJob.start();
 	}
 	
 	public void runValidateJobProcess() {
-		
-		Thread threadGetPrinterAttributes = new Thread(getPrinterAttributes); 
-		threadGetPrinterAttributes.start(); 
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}  
-
+		Thread threadValidateJobAttributes = new Thread(getJobAttributes);  
+		threadValidateJobAttributes.start(); 
 	}
 	
-	public void runGetPrinterAttributes() {
-		Thread threadGetJobAttributes = new Thread(getJobAttributes); 
-		threadGetJobAttributes.start();
-		try {
-			Thread.sleep(1000);
-		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+	public void runGetPrinterAttributeProcess() {
+		Thread threadGetPrinterAttributes = new Thread(getPrinterAttributes); 
+		threadGetPrinterAttributes.start();
 	}
 		
 		Runnable getPrinterAttributes = new Runnable () {
 			public void run() {
 //				while(true) {
 				Log.d("Alex", "run getPrinterAttributes!"); 
+				Log.d("Alex", "printerAttriByte.length is: "+printerAttriByte.length); 
 				try{
 					HttpClient httpClient = new DefaultHttpClient();
 					HttpPost httpPost=new HttpPost(urlStr);
@@ -479,8 +487,9 @@ public class Print {
 					httpPost.getParams().setParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, true); 
 					httpPost.setHeader("Content-Type", "application/ipp");
 					httpPost.setEntity(new ByteArrayEntity(printerAttriByte));
-
+					Log.d("Alex", "printerAttriByte.length is: "+printerAttriByte.length); 
 					HttpResponse httpResponse = httpClient.execute(httpPost);
+//					Log.d("Alex", "getPrinterAttributes: httpResponse is: "+httpResponse.getEntity()); 
 				} catch (IOException e) {
 						// TODO Auto-generated catch block
 					Log.d("Alex", "IOException--getPrintAttributes"); 
@@ -494,7 +503,8 @@ public class Print {
 		Runnable getJobAttributes = new Runnable () {
 			public void run() {
 //				while(true) {
-				Log.d("Alex", "run getJobAttributes!"); 
+				Log.d("Alex", "run getJobAttributes!");
+				Log.d("Alex", "validateJobByte.length is: "+validateJobByte.length); 
 				try{
 					HttpClient httpClient = new DefaultHttpClient();
 					HttpPost httpPost=new HttpPost(urlStr);
@@ -505,8 +515,9 @@ public class Print {
 					httpPost.getParams().setParameter(CoreProtocolPNames.USE_EXPECT_CONTINUE, true); 
 					httpPost.setHeader("Content-Type", "application/ipp");
 					httpPost.setEntity(new ByteArrayEntity(validateJobByte));
-
+					Log.d("Alex", "validateJobByte.length is: "+validateJobByte.length); 
 					HttpResponse httpResponse = httpClient.execute(httpPost);
+//					Log.d("Alex", "getJobAttributes: httpResponse is: "+httpResponse.getEntity());
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					Log.d("Alex", "IOException--getJobAttributes"); 
@@ -520,6 +531,7 @@ public class Print {
 			public void run() {
 				Log.d("Alex", "run sendPrintJob!");
 				int delimiter_length = 4 ;
+				Log.d("Alex", "printJobByte.length is: "+printJobByte.length); 
 				byte[] chunkLenByteArray = Integer.toHexString(printJobByte.length).getBytes(); //length in hex for each chunk's size
 				int length_byte_length = chunkLenByteArray.length; 
 				Log.d("Alex", "length = "+(delimiter_length+length_byte_length)); 
@@ -535,6 +547,7 @@ public class Print {
 					
 					OutputStream outputStream = connection.getOutputStream();
 					outputStream.write(totalPrintJobByte);
+					Log.d("Alex", "totalPrintJobByte.length is: "+totalPrintJobByte.length); 
 					outputStream.flush();
 					outputStream.close();
 

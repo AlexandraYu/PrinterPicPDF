@@ -62,6 +62,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.printer.PopupPicker;
+import com.example.printer.Print;
 import com.example.printer.R;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFImage;
@@ -175,7 +176,11 @@ public abstract class PdfViewerActivity extends Activity {
 					if (copy<0)
 						copy=1; 
 					Toast.makeText(context, "Print out "+String.valueOf(copy)+" copies", Toast.LENGTH_SHORT).show(); 
-					//TODO: send copy to print......
+					//send copy to print
+					Print print = new Print(context, copy, jobName); 
+					print.runGetPrinterAttributeProcess();
+					print.runValidateJobProcess();
+					print.runPrintJobProcess();
 					copy=-1; 
 					dialog.cancel();
 				}
