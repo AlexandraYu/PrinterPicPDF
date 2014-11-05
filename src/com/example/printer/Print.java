@@ -28,9 +28,10 @@ public class Print {
 	private Context context; 
 	private int quantity;
 	private String filePath; 
+	private String ip; 
 	private byte[] totalPrintJobByte; 
-	private String urlStr="http://192.168.0.101:631"; 
-	private String urlLocStr="http://192.168.0.101:631/USB1_LQ";
+	private String urlStr;//="http://192.168.0.101:631"; 
+	private String urlLocStr;//="http://192.168.0.101:631/USB1_LQ";
 	
 	public byte[] intToByteArray(int value) {
 	    return new byte[] {
@@ -419,10 +420,13 @@ public class Print {
 				0x03 //End of attributes			
 			};
 			
-	public Print(Context c, int copy, String path) {
+	public Print(Context c, int copy, String path, String ipAddress) {
 		context = c; 
 		quantity = copy; 
 		filePath = path; 
+		ip = ipAddress; 
+		urlStr = "http://"+ip+":631";
+		urlLocStr = urlStr+"/USB1_LQ";
 	}
 	
 	public void runPrintJobProcess() {

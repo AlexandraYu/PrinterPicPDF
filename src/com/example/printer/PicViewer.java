@@ -1,6 +1,8 @@
 package com.example.printer;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Comparator;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -11,6 +13,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.print.PrintHelper;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -19,6 +23,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -38,6 +43,8 @@ public class PicViewer extends Activity {
 	private NumberPicker numPicker; 
 	private static final int MAX_CHOICE=9; 
 	private static final int MIN_CHOICE=1;
+	private static String ip; 
+	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.pic_viewer_layout);
@@ -52,6 +59,7 @@ public class PicViewer extends Activity {
 	
 	@Override
     public boolean onCreateOptionsMenu(Menu menu) {
+		Log.d("Alex", "in onCreateOptionsMenu, ip is: "+ip); 
         MenuInflater inflater = getMenuInflater();
         inflater.inflate(R.menu.main, menu);
 //        printKey = menu.getItem(0);
@@ -63,7 +71,11 @@ public class PicViewer extends Activity {
         switch (item.getItemId()) {
         case R.id.action_print:
             //print action
-        	printPicture();
+        	Log.d("Alex", "what is ip? "+ip); 
+        	if(ip!=null) {
+        		printPicture(ip);
+        	}
+        	else Toast.makeText(context, "Please connect to approriate network before printing.", Toast.LENGTH_SHORT).show(); 
             return true;
         default:
             return super.onOptionsItemSelected(item);
@@ -94,7 +106,10 @@ public class PicViewer extends Activity {
 			*/
 	}
 	
-	public void printPicture() {
+	public static void setPrinterIP(String ipAddress) {
+		ip = ipAddress; 
+	}
+	public void printPicture(final String ipAddress) {
 		/*
 		PrintHelper photoPrinter = new PrintHelper(context);
 		photoPrinter.setScaleMode(PrintHelper.SCALE_MODE_FIT);
@@ -134,7 +149,7 @@ public class PicViewer extends Activity {
 						copy=1; 
 					Toast.makeText(context, "Print out "+String.valueOf(copy)+" copies", Toast.LENGTH_SHORT).show(); 
 					//send copy to print......
-					Print print = new Print(context, copy, filePath); 
+					Print print = new Print(context, copy, filePath, ipAddress); 
 					print.runGetPrinterAttributeProcess();
 					print.runValidateJobProcess();
 					print.runPrintJobProcess();
@@ -152,5 +167,4 @@ public class PicViewer extends Activity {
 		alertDialog.show();
 //		printKey.setEnabled(false); 
 	}
-	
 }

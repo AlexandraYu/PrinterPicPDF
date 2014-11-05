@@ -6,6 +6,7 @@ import java.util.Comparator;
 
 import com.example.printer.DisplayPic.ShowPictureList;
 
+import net.sf.andpdf.pdfviewer.PdfViewerActivity;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
@@ -38,7 +39,8 @@ public class DisplayPDF extends Activity {
 	private ListView listView;
 	private final int MENU_LIST1 = Menu.FIRST; 	 /* menu parameters*/
 	private final String START_PDF_VIEWER_INTENT="com.example.printer.VIEW_MY_PDF";
-	private final int UPDATE_STATUS_COMPLETE=2000;
+	private final int UPDATE_STATUS_COMPLETE=1000;
+	private final int RECEIVED_IP=2000; 
 	private ProgressDialog progressDialog;
 
 
@@ -49,6 +51,8 @@ public class DisplayPDF extends Activity {
 		context = this;
 		pdfFileList = new ArrayList<PDFFileInfo>();
 		listView = (ListView) findViewById(R.id.listview);
+		ListenUDPBroadcast listenUDP = new ListenUDPBroadcast(handler); 
+		new Thread(listenUDP).start();
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -235,7 +239,7 @@ public class DisplayPDF extends Activity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 				case UPDATE_STATUS_COMPLETE:
-					Log.d("Alex", "Am I HERE??"); 
+					Log.d("Alex", "UPDATE_STATUS_COMPLETE"); 
 					Collections.sort(pdfFileList, new Comparator<PDFFileInfo>() {
 						public int compare(PDFFileInfo a, PDFFileInfo b){
 							return a.getName().compareTo(b.getName()); 
@@ -243,6 +247,11 @@ public class DisplayPDF extends Activity {
 					});
 					((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 					progressDialog.dismiss(); //info loaded ready, progress dialog can be dismissed.
+					break;
+				case RECEIVED_IP:
+					Log.d("Alex", "RECEIVED_IP");
+					String ip = (String)msg.obj; 
+					PdfViewerActivity.setPrinterIP(ip); 
 					break;
 			}
 		}

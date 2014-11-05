@@ -74,9 +74,9 @@ import com.sun.pdfview.font.PDFFont;
 
 
 /**
- * U:\Android\android-sdk-windows-1.5_r1\tools\adb push u:\Android\simple_T.pdf /data/test.pdf
- * @author ferenc.hechler
+ * partial integration from github--ferenc.hechler
  */
+
 public abstract class PdfViewerActivity extends Activity {
 
 	private static final int STARTPAGE = 1;
@@ -127,6 +127,7 @@ public abstract class PdfViewerActivity extends Activity {
     private NumberPicker numPicker; 
     private static final int MIN_CHOICE = 1; 
     private static final int MAX_CHOICE = 9; 
+    private static String ip; 
 //    private MenuItem printKey; 
 
     /*private View navigationPanel;
@@ -139,7 +140,11 @@ public abstract class PdfViewerActivity extends Activity {
     private Thread backgroundThread;
     private Handler uiHandler;
 
-    public void printDocument() {
+    public static void setPrinterIP(String ipAddress) {
+		ip = ipAddress; 
+	}
+    
+    public void printDocument(final String ipAddress) {
     	/*
 	    PrintManager printManager = (PrintManager) getSystemService(Context.PRINT_SERVICE);
 //	    jobName = getString(R.string.app_name) + " Document"; 
@@ -172,12 +177,13 @@ public abstract class PdfViewerActivity extends Activity {
 			.setCancelable(false)
 			.setView(npView)
 			.setPositiveButton(R.string.dialog_ok,new DialogInterface.OnClickListener() {
-				public void onClick(DialogInterface dialog,int id) {
+				public void onClick(DialogInterface dialog, int id) {
 					if (copy<0)
 						copy=1; 
 					Toast.makeText(context, "Print out "+String.valueOf(copy)+" copies", Toast.LENGTH_SHORT).show(); 
 					//send copy to print
-					Print print = new Print(context, copy, jobName); 
+					Log.d("Alex", "PdfViewerActivity, ip is: "+ipAddress);
+					Print print = new Print(context, copy, jobName, ipAddress); 
 					print.runGetPrinterAttributeProcess();
 					print.runValidateJobProcess();
 					print.runPrintJobProcess();
@@ -572,8 +578,12 @@ public abstract class PdfViewerActivity extends Activity {
     		break; 
     	} */
     	case R.id.action_print:
-    		printDocument(); 
-    		return true; 
+    		Log.d("Alex", "PdfViewerActivity, what is ip? "+ip); 
+        	if(ip!=null) {
+        		printDocument(ip);
+        	}
+        	else Toast.makeText(context, "Please connect to approriate network before printing.", Toast.LENGTH_SHORT).show(); 
+            return true; 
     		
     	default:
             return super.onOptionsItemSelected(item);

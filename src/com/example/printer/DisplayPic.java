@@ -43,17 +43,22 @@ public class DisplayPic extends Activity {
 	private Bitmap bMapImage, thumbImage; 
 	private ProgressDialog progressDialog;
 	private final int UPDATE_STATUS_COMPLETE=1000;
+	private final int RECIEVED_IP=2000; 
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		Log.d("Alex", "DisplayPic onCreate"); 
 		context = this;
 		picFileList = new ArrayList<PicFileInfo>(); 
 		listView = (ListView) findViewById(R.id.listview);
+		ListenUDPBroadcast listenUDP = new ListenUDPBroadcast(handler); 
+		new Thread(listenUDP).start();
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
+		Log.d("Alex", "DisplayPic onCreateOptionMenu"); 
 		int idGroup1 = 0; 
 		int orderMenuItem1 = Menu.NONE; 
 		menu.add(idGroup1, MENU_LIST1, orderMenuItem1, R.string.show_pdf); 
@@ -75,10 +80,12 @@ public class DisplayPic extends Activity {
 	}	
 
 	protected void onPause() {
+		Log.d("Alex", "DisplayPic onPause"); 
 		super.onPause();
 	}
 	
 	protected void onResume() {
+		Log.d("Alex", "DisplayPic onResume"); 
 		super.onResume();
 		picFileList.clear();
 		progressDialog = ProgressDialog.show(context, getString(R.string.progress_dialog_title), getString(R.string.progress_dialog_content), false); //since it might take a while for info to load
@@ -145,10 +152,10 @@ public class DisplayPic extends Activity {
 				//make thumbnail for pics
 				bMapImage = BitmapFactory.decodeFile(thisPath); 
 				thumbImage = Bitmap.createScaledBitmap(bMapImage, THUMBNAIL_SIZE, THUMBNAIL_SIZE, false);
-
+/*
 				Log.d("Alex", "thisName is: "+thisName);
 				Log.d("Alex", "thisSize is: "+thisSize);
-				Log.d("Alex", "thisPath is: "+thisPath);
+				Log.d("Alex", "thisPath is: "+thisPath); */
 				picFileList.add(new PicFileInfo(thisName, thisSize, thisPath, thumbImage));
 			}
 			while (picFileCr.moveToNext());
@@ -234,7 +241,7 @@ public class DisplayPic extends Activity {
 		public void handleMessage(Message msg) {
 			switch (msg.what) {
 				case UPDATE_STATUS_COMPLETE:
-					Log.d("Alex", "Am I HERE??"); 
+					Log.d("Alex", "UPDATE_STATUS_COMPLETE"); 
 					Collections.sort(picFileList, new Comparator<PicFileInfo>() {
 						public int compare(PicFileInfo a, PicFileInfo b){
 							return a.getName().compareTo(b.getName()); 
@@ -242,6 +249,11 @@ public class DisplayPic extends Activity {
 					});
 					((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 					progressDialog.dismiss(); //info loaded ready, progress dialog can be dismissed.
+					break;
+				case RECIEVED_IP:
+					Log.d("Alex", "RECIEVED_IP");
+					String ip = (String)msg.obj; 
+					PicViewer.setPrinterIP(ip); 
 					break;
 			}
 		}
