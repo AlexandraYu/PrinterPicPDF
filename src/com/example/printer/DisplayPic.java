@@ -1,5 +1,6 @@
 package com.example.printer;
 
+import com.example.printer.ResponseCountdown;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.ContentResolver;
@@ -43,8 +44,9 @@ public class DisplayPic extends Activity {
 	private Bitmap bMapImage, thumbImage; 
 	private ProgressDialog progressDialog;
 	private final int UPDATE_STATUS_COMPLETE=1000;
-	private final int RECIEVED_IP=2000; 
-
+	private final int RECEIVED_IP=2000; 
+	private final int IP_DISAPPEARED=6000; 
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,6 +57,8 @@ public class DisplayPic extends Activity {
 		listView = (ListView) findViewById(R.id.listview);
 		ListenUDPBroadcast listenUDP = new ListenUDPBroadcast(handler); 
 		new Thread(listenUDP).start();
+		ResponseCountdown responseCountdown = new ResponseCountdown(handler); 
+		new Thread(responseCountdown).start(); 
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -239,6 +243,7 @@ public class DisplayPic extends Activity {
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
+			String ip;
 			switch (msg.what) {
 				case UPDATE_STATUS_COMPLETE:
 					Log.d("Alex", "UPDATE_STATUS_COMPLETE"); 
@@ -250,11 +255,20 @@ public class DisplayPic extends Activity {
 					((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 					progressDialog.dismiss(); //info loaded ready, progress dialog can be dismissed.
 					break;
-				case RECIEVED_IP:
-					Log.d("Alex", "RECIEVED_IP");
-					String ip = (String)msg.obj; 
+				case RECEIVED_IP:
+					Log.d("Alex", "RECEIVED_IP");
+					ip = (String)msg.obj;
+					Log.d("Alex", "RECEIVED_IP, ip is: "+ip); 
 					PicViewer.setPrinterIP(ip); 
+					ResponseCountdown.setFlag(true); 
 					break;
+				case IP_DISAPPEARED:
+					Log.d("Alex", "IP_DISAPPEARED"); 
+					ip = (String)msg.obj;
+					Log.d("Alex", "IP_DISAPPEARED, ip is: "+ip);
+					PicViewer.setPrinterIP(ip); 
+					ResponseCountdown.setFlag(false); 
+					break; 
 			}
 		}
 	};
