@@ -41,6 +41,7 @@ public class DisplayPDF extends Activity {
 	private final String START_PDF_VIEWER_INTENT="com.example.printer.VIEW_MY_PDF";
 	private final int UPDATE_STATUS_COMPLETE=1000;
 	private final int RECEIVED_IP=2000; 
+	private final int IP_DISAPPEARED=6000; 
 	private ProgressDialog progressDialog;
 
 
@@ -53,6 +54,8 @@ public class DisplayPDF extends Activity {
 		listView = (ListView) findViewById(R.id.listview);
 		ListenUDPBroadcast listenUDP = new ListenUDPBroadcast(handler); 
 		new Thread(listenUDP).start();
+		ResponseCountdown responseCountdown = new ResponseCountdown(handler); 
+		new Thread(responseCountdown).start(); 
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -249,10 +252,14 @@ public class DisplayPDF extends Activity {
 					progressDialog.dismiss(); //info loaded ready, progress dialog can be dismissed.
 					break;
 				case RECEIVED_IP:
-					Log.d("Alex", "RECEIVED_IP");
-					String ip = (String)msg.obj; 
-					PdfViewerActivity.setPrinterIP(ip); 
-					break;
+					Log.d("Alex", "RECIEVED_IP");
+//					String ip = (String)msg.obj; 
+//					PicViewer.setPrinterIP(ip); 
+//					break;
+				case IP_DISAPPEARED:
+					Log.d("Alex", "IP_DISAPPEARED"); 
+					String ip = (String)msg.obj;
+					PicViewer.setPrinterIP(ip);  
 			}
 		}
 	};
