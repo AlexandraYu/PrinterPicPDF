@@ -255,14 +255,14 @@ public class DisplayPDF extends Activity {
 					Log.d("Alex", "RECEIVED_IP");
 					ip = (String)msg.obj;
 					Log.d("Alex", "RECEIVED_IP, ip is: "+ip); 
-					PicViewer.setPrinterIP(ip); 
+					PdfViewerActivity.setPrinterIP(ip); 
 					ResponseCountdown.setFlag(true); 
 					break;
 				case IP_DISAPPEARED:
 					Log.d("Alex", "IP_DISAPPEARED"); 
 					ip = (String)msg.obj;
 					Log.d("Alex", "IP_DISAPPEARED, ip is: "+ip);
-					PicViewer.setPrinterIP(ip); 
+					PdfViewerActivity.setPrinterIP(ip); 
 					ResponseCountdown.setFlag(false); 
 					break; 
 			}
