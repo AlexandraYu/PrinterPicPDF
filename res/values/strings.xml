@@ -15,5 +15,5 @@
     <string name="dialog_cancel">Cancel</string>
     <string name="print_copy_title">Print...</string>
     <string name="print_copy_instruction">Choose how many copies to print: </string>
-
+	<string name="printer_disconnect_warning">Please make sure your printer is properly connected.</string>
 </resources>

@@ -76,7 +76,7 @@ public class ListenUDPBroadcast implements Runnable{
 						Log.d("Alex", "ip : "+ ip);	
 						Message message = handler.obtainMessage(RECEIVED_IP, ip); //int what, Object obj
 						handler.sendMessage(message);
-						ResponseCountdown.setFlag(true); 
+//						ResponseCountdown.setFlag(true); 
 						
 //						Log.d("Alex", "anotherHandler is: "+anotherHandler);
 //						Message message2 = anotherHandler.obtainMessage(COUNTDOWN_RESET);

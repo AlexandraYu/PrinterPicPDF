@@ -582,7 +582,7 @@ public abstract class PdfViewerActivity extends Activity {
         	if(ip!=null) {
         		printDocument(ip);
         	}
-        	else Toast.makeText(context, "Please connect to approriate network before printing.", Toast.LENGTH_SHORT).show(); 
+        	else Toast.makeText(context, R.string.printer_disconnect_warning, Toast.LENGTH_SHORT).show(); 
             return true; 
     		
     	default:

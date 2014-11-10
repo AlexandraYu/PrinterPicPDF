@@ -75,7 +75,7 @@ public class PicViewer extends Activity {
         	if(ip!=null) {
         		printPicture(ip);
         	}
-        	else Toast.makeText(context, "Please connect to approriate network before printing.", Toast.LENGTH_SHORT).show(); 
+        	else Toast.makeText(context, R.string.printer_disconnect_warning, Toast.LENGTH_SHORT).show(); 
             return true;
         default:
             return super.onOptionsItemSelected(item);

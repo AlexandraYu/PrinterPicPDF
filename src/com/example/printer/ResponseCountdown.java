@@ -9,7 +9,7 @@ import android.util.Log;
 public class ResponseCountdown implements Runnable{
 //	private final int COUNTDOWN_RESET = 3000; 
 	private final int IP_DISAPPEARED = 6000; 
-	private int count = 0; 
+	private static int count = 0; 
 	private Handler myHandler; 
 	private static boolean flag=false; 
 	
@@ -27,7 +27,7 @@ public class ResponseCountdown implements Runnable{
 //		listenUDP.receiveHandler(handler); 
 		while (true) {
 			Log.d("Alex", "flag is: "+flag); 
-			if(flag) count=0;
+//			if(flag) count=0;
 			try {
 				Thread.sleep(1000);
 			} catch (InterruptedException e) {
@@ -41,7 +41,7 @@ public class ResponseCountdown implements Runnable{
 				//the printer/AP is dead, send out a signal to clear out the current printer IP
 				Message msg = myHandler.obtainMessage(IP_DISAPPEARED, null); 
 				myHandler.sendMessage(msg); 
-				setFlag(false); 
+//				setFlag(false); 
 //				count = 0; 
 			}
 		Log.d("Alex", "ResponseCountdown, count is: "+count); 	
@@ -63,6 +63,7 @@ public class ResponseCountdown implements Runnable{
 	public static void setFlag(boolean setFlag){
 		flag = setFlag; 
 		Log.d("Alex", "setFlag, flag is: "+flag); 
+		if (flag) count=0; 
 	}
 	
 

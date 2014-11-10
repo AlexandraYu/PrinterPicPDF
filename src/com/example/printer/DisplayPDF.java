@@ -43,8 +43,7 @@ public class DisplayPDF extends Activity {
 	private final int RECEIVED_IP=2000; 
 	private final int IP_DISAPPEARED=6000; 
 	private ProgressDialog progressDialog;
-
-
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -240,6 +239,7 @@ public class DisplayPDF extends Activity {
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
+			String ip;
 			switch (msg.what) {
 				case UPDATE_STATUS_COMPLETE:
 					Log.d("Alex", "UPDATE_STATUS_COMPLETE"); 
@@ -252,14 +252,19 @@ public class DisplayPDF extends Activity {
 					progressDialog.dismiss(); //info loaded ready, progress dialog can be dismissed.
 					break;
 				case RECEIVED_IP:
-					Log.d("Alex", "RECIEVED_IP");
-//					String ip = (String)msg.obj; 
-//					PicViewer.setPrinterIP(ip); 
-//					break;
+					Log.d("Alex", "RECEIVED_IP");
+					ip = (String)msg.obj;
+					Log.d("Alex", "RECEIVED_IP, ip is: "+ip); 
+					PicViewer.setPrinterIP(ip); 
+					ResponseCountdown.setFlag(true); 
+					break;
 				case IP_DISAPPEARED:
 					Log.d("Alex", "IP_DISAPPEARED"); 
-					String ip = (String)msg.obj;
-					PicViewer.setPrinterIP(ip);  
+					ip = (String)msg.obj;
+					Log.d("Alex", "IP_DISAPPEARED, ip is: "+ip);
+					PicViewer.setPrinterIP(ip); 
+					ResponseCountdown.setFlag(false); 
+					break; 
 			}
 		}
 	};
