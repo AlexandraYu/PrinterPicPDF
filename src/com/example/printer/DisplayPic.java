@@ -123,6 +123,17 @@ public class DisplayPic extends Activity {
 		});
 	}
 	
+	public static String getMimeType(String filePath)
+	{
+	    String type = null;
+	    String extension = MimeTypeMap.getFileExtensionFromUrl(filePath);
+	    if (extension != null) {
+	        MimeTypeMap mime = MimeTypeMap.getSingleton();
+	        type = mime.getMimeTypeFromExtension(extension);
+	    }
+	    return type;
+	}
+	
 	public void getPicfiles(Handler h) {
 		ContentResolver picFileResolver = context.getContentResolver();
 //		Uri uri = MediaStore.Images.Media.getContentUri("External");
@@ -152,15 +163,19 @@ public class DisplayPic extends Activity {
 				String thisName = picFileCr.getString(nameColumn);
 				String thisSize = picFileCr.getString(sizeColumn);
 				String thisPath = picFileCr.getString(pathColumn);
-				
-				//make thumbnail for pics
-				bMapImage = BitmapFactory.decodeFile(thisPath); 
-				thumbImage = Bitmap.createScaledBitmap(bMapImage, THUMBNAIL_SIZE, THUMBNAIL_SIZE, false);
-/*
-				Log.d("Alex", "thisName is: "+thisName);
-				Log.d("Alex", "thisSize is: "+thisSize);
-				Log.d("Alex", "thisPath is: "+thisPath); */
-				picFileList.add(new PicFileInfo(thisName, thisSize, thisPath, thumbImage));
+				String type = getMimeType(thisPath); 
+				Log.d("Alex", "type is: "+type); 
+				if(type!=null && type.equals("image/jpeg")) {
+					//make thumbnail for pics
+					bMapImage = BitmapFactory.decodeFile(thisPath); 
+					thumbImage = Bitmap.createScaledBitmap(bMapImage, THUMBNAIL_SIZE, THUMBNAIL_SIZE, false);
+
+					Log.d("Alex", "thisName is: "+thisName);
+					/*
+					Log.d("Alex", "thisSize is: "+thisSize);
+					Log.d("Alex", "thisPath is: "+thisPath); */
+					picFileList.add(new PicFileInfo(thisName, thisSize, thisPath, thumbImage));
+				}
 			}
 			while (picFileCr.moveToNext());
 				Log.d("Alex", "picFileList size is: "+picFileList.size());
