@@ -2,22 +2,27 @@ package com.example.printer;
 
 import com.example.printer.ListenUDPBroadcast;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 public class ResponseCountdown implements Runnable{
-//	private final int COUNTDOWN_RESET = 3000; 
-	private final int IP_DISAPPEARED = 6000; 
+//	private final int IP_DISAPPEARED = 6000;
+	private Context context; 
+	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
 	private static int count = 0; 
-	private Handler myHandler; 
+	private static Handler myHandler; 
 	private static boolean flag=false; 
-	
+/*	
 	public ResponseCountdown(Handler h) { //to receive handler from ListenUDPBroadcast to reset countdown, h is given by ListenUDPBroadcast
 		myHandler = h; 
 	}
-	
-	public ResponseCountdown() {}
+*/	
+	public ResponseCountdown(Context ctx) {
+		context = ctx; 
+	}
 	
 	@Override
 	public void run() {
@@ -39,10 +44,11 @@ public class ResponseCountdown implements Runnable{
 			if (count<10) continue; 
 			else {			
 				//the printer/AP is dead, send out a signal to clear out the current printer IP
-				Message msg = myHandler.obtainMessage(IP_DISAPPEARED, null); 
-				myHandler.sendMessage(msg); 
+//				Message msg = myHandler.obtainMessage(IP_DISAPPEARED, null); 
+//				myHandler.sendMessage(msg); 
 //				setFlag(false); 
 //				count = 0; 
+				sendIPDisappearedBroadcast(); 
 			}
 		Log.d("Alex", "ResponseCountdown, count is: "+count); 	
 		}
@@ -66,5 +72,14 @@ public class ResponseCountdown implements Runnable{
 		if (flag) count=0; 
 	}
 	
-
+/*
+	public static void setHandler(Handler h) { 
+		myHandler = h; 
+	}
+*/	
+	private void sendIPDisappearedBroadcast(){
+		Intent intent = new Intent();
+		intent.setAction(IP_DISAPPEARED);
+		context.sendBroadcast(intent);
+	}
 }

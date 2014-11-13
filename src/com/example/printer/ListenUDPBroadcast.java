@@ -9,27 +9,32 @@ import java.net.InetSocketAddress;
 import java.net.SocketException;
 import java.nio.charset.Charset;
 
+import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
 public class ListenUDPBroadcast implements Runnable{
-//	private Context context;
+	private Context context;
 	private String ip= null; 
 	private final int PORT = 7411; 
 	private final String BOARD_ATTRIBUTE = "ANNOU"; 
 	private int counter=0;
-	private Handler handler;// anotherHandler; 
-	private final int RECEIVED_IP = 2000; 
-	private final int IP_DISAPPEARED = 6000;
-//	private final int COUNTDOWN_RESET = 3000; 
-	
+	private static Handler handler;
+//	private final int RECEIVED_IP = 2000; 
+//	private final int IP_DISAPPEARED = 6000;
+	private final String RECEIVED_IP = "printer.com.example.received_ip"; 
+
+/*	
 	public ListenUDPBroadcast(Handler h) {
 		Log.d("Alex", "ListenUDPBroadcast is called!"); 
 		handler = h; 
 	}
-	
-	public ListenUDPBroadcast(){}
+	*/
+	public ListenUDPBroadcast(Context ctx){
+		context = ctx; 
+	}
 	
 //	ResponseCountdown responseCountdown = new ResponseCountdown();
 	@Override
@@ -74,20 +79,15 @@ public class ListenUDPBroadcast implements Runnable{
 					if(check) { //found suitable printer/AP within this network
 						ip = packet.getAddress().getHostAddress();
 						Log.d("Alex", "ip : "+ ip);	
-						Message message = handler.obtainMessage(RECEIVED_IP, ip); //int what, Object obj
-						handler.sendMessage(message);
-//						ResponseCountdown.setFlag(true); 
-						
-//						Log.d("Alex", "anotherHandler is: "+anotherHandler);
-//						Message message2 = anotherHandler.obtainMessage(COUNTDOWN_RESET);
-//						anotherHandler.sendMessage(message2); 
-//						break; 
+//						Message message = handler.obtainMessage(RECEIVED_IP, ip); //int what, Object obj
+//						handler.sendMessage(message);
+						ResponseCountdown.setFlag(true); 
+						sendReceiveIPBroadcast(ip); 
 					}
 					else { //found UDP packet but not from the suitable printer
 						//got wrong packet, do nothing. 
 					}
-//					Message message = handler.obtainMessage(RECEIVED_IP, ip);
-//					handler.sendMessage(message);
+
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					Log.d("Alex", "socket didn't receive packet? "); 
@@ -98,9 +98,14 @@ public class ListenUDPBroadcast implements Runnable{
 		}
 	}
 /*
-	public void receiveHandler(Handler handler) { 
-		anotherHandler = handler; 
-		Log.d("Alex", "in receiveHandler, anotherHandler is: "+anotherHandler);
+	public static void setHandler(Handler h) { 
+		handler = h; 
 	}
-	*/
+*/	
+	private void sendReceiveIPBroadcast (String ip){
+		Intent intent = new Intent();
+		intent.setAction(RECEIVED_IP);
+		intent.putExtra("IP", ip); 
+		context.sendBroadcast(intent);
+	}
 }

@@ -4,14 +4,14 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 
-import com.example.printer.DisplayPic.ShowPictureList;
-
 import net.sf.andpdf.pdfviewer.PdfViewerActivity;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -39,10 +39,15 @@ public class DisplayPDF extends Activity {
 	private ListView listView;
 	private final int MENU_LIST1 = Menu.FIRST; 	 /* menu parameters*/
 	private final String START_PDF_VIEWER_INTENT="com.example.printer.VIEW_MY_PDF";
-	private final int UPDATE_STATUS_COMPLETE=1000;
-	private final int RECEIVED_IP=2000; 
-	private final int IP_DISAPPEARED=6000; 
 	private ProgressDialog progressDialog;
+	private final int UPDATE_STATUS_COMPLETE=1000;
+//	private final int RECEIVED_IP=2000; 
+//	private final int IP_DISAPPEARED=6000;
+	private final String RECEIVED_IP="printer.com.example.received_ip"; 
+	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
+	private SignalReceiver myReceiver; 
+	IntentFilter filterReceivedIP = new IntentFilter(RECEIVED_IP);
+	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +56,11 @@ public class DisplayPDF extends Activity {
 		context = this;
 		pdfFileList = new ArrayList<PDFFileInfo>();
 		listView = (ListView) findViewById(R.id.listview);
-		ListenUDPBroadcast listenUDP = new ListenUDPBroadcast(handler); 
-		new Thread(listenUDP).start();
-		ResponseCountdown responseCountdown = new ResponseCountdown(handler); 
-		new Thread(responseCountdown).start(); 
+		myReceiver = new SignalReceiver(); 
+//		ListenUDPBroadcast listenUDP = new ListenUDPBroadcast(handler); 
+//		new Thread(listenUDP).start();
+//		ResponseCountdown responseCountdown = new ResponseCountdown(handler);
+//		new Thread(responseCountdown).start(); 
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -80,10 +86,17 @@ public class DisplayPDF extends Activity {
 
 	protected void onPause() {
 		super.onPause();
+		unregisterReceiver(myReceiver); 
+		Log.d("Alex", "DisplayPDF onPause"); 
 	}
 	
 	protected void onResume() {
 		super.onResume();
+		Log.d("Alex", "DisplayPDF onResume"); 
+		registerReceiver(myReceiver, filterReceivedIP);
+		registerReceiver(myReceiver, filterIPDisappeared);
+//		ListenUDPBroadcast.setHandler(handler);
+//		ResponseCountdown.setHandler(handler);
 		pdfFileList.clear();
 		progressDialog = ProgressDialog.show(context, getString(R.string.progress_dialog_title), getString(R.string.progress_dialog_content), false); //since it might take a while for info to load
 //		getPDFfiles();
@@ -123,7 +136,7 @@ public class DisplayPDF extends Activity {
 	
 	public boolean forbiddenPath(String path) {
 		String pathFilter=Environment.getExternalStorageDirectory().getAbsolutePath() + PATH_PRIFIX;
-		Log.d("Alex", "pathFilter is "+pathFilter); 
+//		Log.d("Alex", "pathFilter is "+pathFilter); 
 		if (path.startsWith(pathFilter)) return true;
 		else 
 			return false;
@@ -157,9 +170,9 @@ public class DisplayPDF extends Activity {
 				String thisName = pdfFileCr.getString(nameColumn);
 				String thisSize = pdfFileCr.getString(sizeColumn);
 				String thisPath = pdfFileCr.getString(pathColumn); 
-				Log.d("Alex", "thisName is: "+thisName);
-				Log.d("Alex", "thisSize is: "+thisSize);
-				Log.d("Alex", "thisPath is: "+thisPath);
+//				Log.d("Alex", "thisName is: "+thisName);
+//				Log.d("Alex", "thisSize is: "+thisSize);
+//				Log.d("Alex", "thisPath is: "+thisPath);
 				if (!forbiddenPath(thisPath)) 
 					pdfFileList.add(new PDFFileInfo(thisName, thisSize, thisPath));
 			}
@@ -239,7 +252,7 @@ public class DisplayPDF extends Activity {
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			String ip;
+//			String ip;
 			switch (msg.what) {
 				case UPDATE_STATUS_COMPLETE:
 					Log.d("Alex", "UPDATE_STATUS_COMPLETE"); 
@@ -251,22 +264,44 @@ public class DisplayPDF extends Activity {
 					((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 					progressDialog.dismiss(); //info loaded ready, progress dialog can be dismissed.
 					break;
+					/*
 				case RECEIVED_IP:
-					Log.d("Alex", "RECEIVED_IP");
+					Log.d("Alex", "PDF, RECEIVED_IP");
 					ip = (String)msg.obj;
-					Log.d("Alex", "RECEIVED_IP, ip is: "+ip); 
+					Log.d("Alex", "PDF, RECEIVED_IP, ip is: "+ip); 
 					PdfViewerActivity.setPrinterIP(ip); 
 					ResponseCountdown.setFlag(true); 
 					break;
 				case IP_DISAPPEARED:
-					Log.d("Alex", "IP_DISAPPEARED"); 
+					Log.d("Alex", "PDF, IP_DISAPPEARED"); 
 					ip = (String)msg.obj;
-					Log.d("Alex", "IP_DISAPPEARED, ip is: "+ip);
+					Log.d("Alex", "PDF, IP_DISAPPEARED, ip is: "+ip);
 					PdfViewerActivity.setPrinterIP(ip); 
 					ResponseCountdown.setFlag(false); 
-					break; 
+					break; */ 
 			}
 		}
 	};
+/*	
+	private class MyReceiver extends BroadcastReceiver {
+		@Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+			Log.d("Alex", "DisplayPDF onReceive!");
+            if(intent.getAction().equals(RECEIVED_IP)) {
+            	Log.d("Alex", "DisplayPDF got IP!");
+            	String ip=intent.getStringExtra("IP"); 
+            	PdfViewerActivity.setPrinterIP(ip); 
+				ResponseCountdown.setFlag(true); 
+            }
+            else if(intent.getAction().equals(IP_DISAPPEARED)) {
+            	Log.d("Alex", "DisplayPDF got no IP!");
+            	PdfViewerActivity.setPrinterIP(null); 
+				ResponseCountdown.setFlag(false); 
+            }
+            else Log.d("Alex", "DisplayPDF receiver error!"); 
+        }
+    }
+    */
 }
 

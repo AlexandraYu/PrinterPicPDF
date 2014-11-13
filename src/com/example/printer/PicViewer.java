@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
@@ -43,7 +44,12 @@ public class PicViewer extends Activity {
 	private NumberPicker numPicker; 
 	private static final int MAX_CHOICE=9; 
 	private static final int MIN_CHOICE=1;
-	private static String ip; 
+	private static String ip;
+	private SignalReceiver myReceiver;
+	private final String RECEIVED_IP="printer.com.example.received_ip"; 
+	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
+	IntentFilter filterReceivedIP = new IntentFilter(RECEIVED_IP);
+	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -55,6 +61,7 @@ public class PicViewer extends Activity {
 //		button = (Button) findViewById(R.id.bt_print);
 		LayoutInflater inflater = (LayoutInflater) getSystemService(LAYOUT_INFLATER_SERVICE);
 		dialogLayout = inflater.inflate(R.layout.popup,null);
+		myReceiver = new SignalReceiver(); 
 	}
 	
 	@Override
@@ -84,6 +91,7 @@ public class PicViewer extends Activity {
 	
 	protected void onPause() {
 		super.onPause();
+		unregisterReceiver(myReceiver); 
 	}
 	
 	protected void onResume() {
@@ -104,6 +112,8 @@ public class PicViewer extends Activity {
 				}
 			});
 			*/
+		registerReceiver(myReceiver, filterReceivedIP);
+		registerReceiver(myReceiver, filterIPDisappeared);
 	}
 	
 	public static void setPrinterIP(String ipAddress) {

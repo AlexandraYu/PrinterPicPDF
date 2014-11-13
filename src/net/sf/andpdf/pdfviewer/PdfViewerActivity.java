@@ -18,6 +18,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -64,6 +65,7 @@ import android.widget.Toast;
 import com.example.printer.PopupPicker;
 import com.example.printer.Print;
 import com.example.printer.R;
+import com.example.printer.SignalReceiver;
 import com.sun.pdfview.PDFFile;
 import com.sun.pdfview.PDFImage;
 import com.sun.pdfview.PDFPage;
@@ -128,6 +130,12 @@ public abstract class PdfViewerActivity extends Activity {
     private static final int MIN_CHOICE = 1; 
     private static final int MAX_CHOICE = 9; 
     private static String ip; 
+    private final String RECEIVED_IP="printer.com.example.received_ip"; 
+	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
+	private SignalReceiver myReceiver; 
+	IntentFilter filterReceivedIP = new IntentFilter(RECEIVED_IP);
+	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
+	
 //    private MenuItem printKey; 
 
     /*private View navigationPanel;
@@ -360,6 +368,7 @@ public abstract class PdfViewerActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         Log.i(TAG, "onCreate");
+        myReceiver = new SignalReceiver();  
         context = this; 
         //progress = ProgressDialog.show(PdfViewerActivity.this, "Loading", "Loading PDF Page");
         /*closeNavigationHandler = new Handler();
@@ -535,6 +544,17 @@ public abstract class PdfViewerActivity extends Activity {
 //	    printKey = menu.getItem(0);
 	    return super.onCreateOptionsMenu(menu);
     }
+	
+	protected void onResume() {
+		super.onResume(); 
+		registerReceiver(myReceiver, filterReceivedIP);
+		registerReceiver(myReceiver, filterIPDisappeared);
+	}
+	
+	protected void onPause() {
+		super.onPause(); 
+		unregisterReceiver(myReceiver); 
+	}
     
     /**
      * Called when a menu item is selected.

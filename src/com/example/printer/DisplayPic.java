@@ -1,11 +1,14 @@
 package com.example.printer;
 
 import com.example.printer.ResponseCountdown;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -44,8 +47,13 @@ public class DisplayPic extends Activity {
 	private Bitmap bMapImage, thumbImage; 
 	private ProgressDialog progressDialog;
 	private final int UPDATE_STATUS_COMPLETE=1000;
-	private final int RECEIVED_IP=2000; 
-	private final int IP_DISAPPEARED=6000; 
+//	private final int RECEIVED_IP=2000; 
+//	private final int IP_DISAPPEARED=6000; 
+	private final String RECEIVED_IP="printer.com.example.received_ip"; 
+	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
+	private SignalReceiver myReceiver; 
+	IntentFilter filterReceivedIP = new IntentFilter(RECEIVED_IP);
+	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -55,9 +63,12 @@ public class DisplayPic extends Activity {
 		context = this;
 		picFileList = new ArrayList<PicFileInfo>(); 
 		listView = (ListView) findViewById(R.id.listview);
-		ListenUDPBroadcast listenUDP = new ListenUDPBroadcast(handler); 
+		myReceiver = new SignalReceiver();  
+//		ListenUDPBroadcast listenUDP = new ListenUDPBroadcast(handler); 
+		ListenUDPBroadcast listenUDP = new ListenUDPBroadcast(context);
 		new Thread(listenUDP).start();
-		ResponseCountdown responseCountdown = new ResponseCountdown(handler); 
+//		ResponseCountdown responseCountdown = new ResponseCountdown(handler); 
+		ResponseCountdown responseCountdown = new ResponseCountdown(context); 
 		new Thread(responseCountdown).start(); 
 	}
 	
@@ -86,11 +97,16 @@ public class DisplayPic extends Activity {
 	protected void onPause() {
 		Log.d("Alex", "DisplayPic onPause"); 
 		super.onPause();
+		unregisterReceiver(myReceiver);
 	}
 	
 	protected void onResume() {
 		Log.d("Alex", "DisplayPic onResume"); 
 		super.onResume();
+//		ListenUDPBroadcast.setHandler(handler);
+//		ResponseCountdown.setHandler(handler);
+		registerReceiver(myReceiver, filterReceivedIP);
+		registerReceiver(myReceiver, filterIPDisappeared);
 		picFileList.clear();
 		progressDialog = ProgressDialog.show(context, getString(R.string.progress_dialog_title), getString(R.string.progress_dialog_content), false); //since it might take a while for info to load
 //		getPicfiles(handler); 
@@ -144,7 +160,7 @@ public class DisplayPic extends Activity {
 		String sortOrder = null;
 		
 		Cursor picFileCr = picFileResolver.query(uri, projection, selection, selectionArgs, sortOrder);
-		Log.d("Alex", "picFileCr is: "+picFileCr); 
+//		Log.d("Alex", "picFileCr is: "+picFileCr); 
 		if(picFileCr ==null) {
 			Bitmap icon=BitmapFactory.decodeResource(getResources(), R.drawable.emo_im_embarrassed);
 			picFileList.add(new PicFileInfo(getString(R.string.no_pic_found), "", "", icon)); 
@@ -164,13 +180,13 @@ public class DisplayPic extends Activity {
 				String thisSize = picFileCr.getString(sizeColumn);
 				String thisPath = picFileCr.getString(pathColumn);
 				String type = getMimeType(thisPath); 
-				Log.d("Alex", "type is: "+type); 
+//				Log.d("Alex", "type is: "+type); 
 				if(type!=null && type.equals("image/jpeg")) {
 					//make thumbnail for pics
 					bMapImage = BitmapFactory.decodeFile(thisPath); 
 					thumbImage = Bitmap.createScaledBitmap(bMapImage, THUMBNAIL_SIZE, THUMBNAIL_SIZE, false);
 
-					Log.d("Alex", "thisName is: "+thisName);
+//					Log.d("Alex", "thisName is: "+thisName);
 					/*
 					Log.d("Alex", "thisSize is: "+thisSize);
 					Log.d("Alex", "thisPath is: "+thisPath); */
@@ -178,10 +194,10 @@ public class DisplayPic extends Activity {
 				}
 			}
 			while (picFileCr.moveToNext());
-				Log.d("Alex", "picFileList size is: "+picFileList.size());
+//				Log.d("Alex", "picFileList size is: "+picFileList.size());
 		}
 		
-		Log.d("Alex", "will return message??");
+//		Log.d("Alex", "will return message??");
 		Message message = h.obtainMessage(UPDATE_STATUS_COMPLETE);
 		h.sendMessage(message);
 	}
@@ -258,7 +274,7 @@ public class DisplayPic extends Activity {
 	private Handler handler = new Handler() {
 		@Override
 		public void handleMessage(Message msg) {
-			String ip;
+//			String ip;
 			switch (msg.what) {
 				case UPDATE_STATUS_COMPLETE:
 					Log.d("Alex", "UPDATE_STATUS_COMPLETE"); 
@@ -270,10 +286,11 @@ public class DisplayPic extends Activity {
 					((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 					progressDialog.dismiss(); //info loaded ready, progress dialog can be dismissed.
 					break;
+					/*
 				case RECEIVED_IP:
-					Log.d("Alex", "RECEIVED_IP");
+					Log.d("Alex", "DisplayPic RECEIVED_IP");
 					ip = (String)msg.obj;
-					Log.d("Alex", "RECEIVED_IP, ip is: "+ip); 
+					Log.d("Alex", "DisplayPic RECEIVED_IP, ip is: "+ip); 
 					PicViewer.setPrinterIP(ip); 
 					ResponseCountdown.setFlag(true); 
 					break;
@@ -283,8 +300,29 @@ public class DisplayPic extends Activity {
 					Log.d("Alex", "IP_DISAPPEARED, ip is: "+ip);
 					PicViewer.setPrinterIP(ip); 
 					ResponseCountdown.setFlag(false); 
-					break; 
+					break; */ 
 			}
 		}
 	};
+/*	
+	private class MyReceiver extends BroadcastReceiver {
+		@Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO Auto-generated method stub
+			Log.d("Alex", "DisplayPic onReceive!"); 
+            if(intent.getAction().equals(RECEIVED_IP)) {
+            	Log.d("Alex", "DisplayPic got IP!");
+            	String ip=intent.getStringExtra("IP"); 
+            	PicViewer.setPrinterIP(ip); 
+				ResponseCountdown.setFlag(true); 
+            }
+            else if(intent.getAction().equals(IP_DISAPPEARED)) {
+            	Log.d("Alex", "DisplayPic no IP!");
+            	PicViewer.setPrinterIP(null); 
+				ResponseCountdown.setFlag(false); 
+            }
+            else Log.d("Alex", "DisplayPic receiver error!"); 
+        }
+    }
+*/  
 }
