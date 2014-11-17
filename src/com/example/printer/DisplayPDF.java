@@ -58,6 +58,8 @@ public class DisplayPDF extends Activity {
 //		new Thread(listenUDP).start();
 //		ResponseCountdown responseCountdown = new ResponseCountdown(handler);
 //		new Thread(responseCountdown).start(); 
+		listView.setAdapter(new PDFFileListAdapter(context, pdfFileList));
+		clickItem(listView); 
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -104,8 +106,6 @@ public class DisplayPDF extends Activity {
 				return a.getName().compareTo(b.getName()); 
 			}
 		});*/
-		listView.setAdapter(new PDFFileListAdapter(context, pdfFileList));
-		clickItem(listView); 
 	}
 	
 	public class ShowPDFList implements Runnable {
@@ -258,8 +258,8 @@ public class DisplayPDF extends Activity {
 							return a.getName().compareTo(b.getName()); 
 						}
 					});
-					((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 					progressDialog.dismiss(); //info loaded ready, progress dialog can be dismissed.
+					((BaseAdapter) listView.getAdapter()).notifyDataSetChanged(); //do this AFTER dismissing the progressDialog in order to avoid UI being too busy and getting stuck
 					break;
 					/*
 				case RECEIVED_IP:

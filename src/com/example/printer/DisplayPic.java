@@ -64,6 +64,8 @@ public class DisplayPic extends Activity {
 //		ResponseCountdown responseCountdown = new ResponseCountdown(handler); 
 //		ResponseCountdown responseCountdown = new ResponseCountdown(context); 
 //		new Thread(responseCountdown).start(); 
+		listView.setAdapter(new PicFileListAdapter(context, picFileList)); 
+		clickItem(listView); 
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -106,8 +108,6 @@ public class DisplayPic extends Activity {
 //		getPicfiles(handler); 
 		ShowPictureList showPicList = new ShowPictureList(); 
 		new Thread(showPicList). start();
-		listView.setAdapter(new PicFileListAdapter(context, picFileList)); 
-		clickItem(listView); 
 	}
 	
 	public class ShowPictureList implements Runnable {
@@ -277,8 +277,8 @@ public class DisplayPic extends Activity {
 							return a.getName().compareTo(b.getName()); 
 						}
 					});
-					((BaseAdapter) listView.getAdapter()).notifyDataSetChanged();
 					progressDialog.dismiss(); //info loaded ready, progress dialog can be dismissed.
+					((BaseAdapter) listView.getAdapter()).notifyDataSetChanged(); //do this AFTER dismissing the progressDialog in order to avoid UI being too busy and getting stuck
 					break;
 					/*
 				case RECEIVED_IP:
