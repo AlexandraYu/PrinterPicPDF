@@ -8,7 +8,7 @@ import net.sf.andpdf.pdfviewer.PdfViewerActivity;
 
 public class SignalReceiver extends BroadcastReceiver{
 	private final String RECEIVED_IP="printer.com.example.received_ip"; 
-	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
+
 	@Override
     public void onReceive(Context context, Intent intent) {
         // TODO Auto-generated method stub
@@ -18,13 +18,10 @@ public class SignalReceiver extends BroadcastReceiver{
         	String ip=intent.getStringExtra("IP"); 
         	PicViewer.setPrinterIP(ip);
         	PdfViewerActivity.setPrinterIP(ip);
-			ResponseCountdown.setFlag(true); 
-        }
-        else if(intent.getAction().equals(IP_DISAPPEARED)) {
-        	Log.d("Alex", "no IP!");
-        	PicViewer.setPrinterIP(null); 
-        	PdfViewerActivity.setPrinterIP(null);
-        	ResponseCountdown.setFlag(false); 
+        	long time=System.currentTimeMillis();
+        	Log.d("Alex", "broadcast time! "+time);
+        	PicViewer.setGotPacketTime(time); 
+        	PdfViewerActivity.setGotPacketTime(time); ; 
         }
         else Log.d("Alex", "receiver error!"); 
     }

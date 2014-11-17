@@ -130,11 +130,12 @@ public abstract class PdfViewerActivity extends Activity {
     private static final int MIN_CHOICE = 1; 
     private static final int MAX_CHOICE = 9; 
     private static String ip; 
+    private static long time; 
     private final String RECEIVED_IP="printer.com.example.received_ip"; 
-	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
+//	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
 	private SignalReceiver myReceiver; 
 	IntentFilter filterReceivedIP = new IntentFilter(RECEIVED_IP);
-	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
+//	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
 	
 //    private MenuItem printKey; 
 
@@ -150,6 +151,11 @@ public abstract class PdfViewerActivity extends Activity {
 
     public static void setPrinterIP(String ipAddress) {
 		ip = ipAddress; 
+	}
+    
+    public static void setGotPacketTime(long t) {
+		// TODO Auto-generated method stub
+		time = t; 
 	}
     
     public void printDocument(final String ipAddress) {
@@ -548,7 +554,7 @@ public abstract class PdfViewerActivity extends Activity {
 	protected void onResume() {
 		super.onResume(); 
 		registerReceiver(myReceiver, filterReceivedIP);
-		registerReceiver(myReceiver, filterIPDisappeared);
+//		registerReceiver(myReceiver, filterIPDisappeared);
 	}
 	
 	protected void onPause() {
@@ -598,11 +604,16 @@ public abstract class PdfViewerActivity extends Activity {
     		break; 
     	} */
     	case R.id.action_print:
-    		Log.d("Alex", "PdfViewerActivity, what is ip? "+ip); 
-        	if(ip!=null) {
+    		Long currentTime = System.currentTimeMillis(); 
+    		Log.d("xxxx", "PdfViewerActivity, what is ip? "+ip); 
+    		if(((currentTime-time) < 10000) && (ip!=null)) {
         		printDocument(ip);
         	}
-        	else Toast.makeText(context, R.string.printer_disconnect_warning, Toast.LENGTH_SHORT).show(); 
+        	else 
+        	{
+        		Log.d("xxxx", "No printer!!"); 
+        		Toast.makeText(context, R.string.printer_disconnect_warning, Toast.LENGTH_SHORT).show(); 
+        	}
             return true; 
     		
     	default:

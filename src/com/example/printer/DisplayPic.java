@@ -1,10 +1,7 @@
 package com.example.printer;
 
-import com.example.printer.ResponseCountdown;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
@@ -17,7 +14,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.MediaStore;
-import android.provider.OpenableColumns;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -28,10 +24,8 @@ import android.webkit.MimeTypeMap;
 import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -50,10 +44,10 @@ public class DisplayPic extends Activity {
 //	private final int RECEIVED_IP=2000; 
 //	private final int IP_DISAPPEARED=6000; 
 	private final String RECEIVED_IP="printer.com.example.received_ip"; 
-	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
+//	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
 	private SignalReceiver myReceiver; 
 	IntentFilter filterReceivedIP = new IntentFilter(RECEIVED_IP);
-	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
+//	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -68,8 +62,8 @@ public class DisplayPic extends Activity {
 		ListenUDPBroadcast listenUDP = new ListenUDPBroadcast(context);
 		new Thread(listenUDP).start();
 //		ResponseCountdown responseCountdown = new ResponseCountdown(handler); 
-		ResponseCountdown responseCountdown = new ResponseCountdown(context); 
-		new Thread(responseCountdown).start(); 
+//		ResponseCountdown responseCountdown = new ResponseCountdown(context); 
+//		new Thread(responseCountdown).start(); 
 	}
 	
 	public boolean onCreateOptionsMenu(Menu menu) {
@@ -106,7 +100,7 @@ public class DisplayPic extends Activity {
 //		ListenUDPBroadcast.setHandler(handler);
 //		ResponseCountdown.setHandler(handler);
 		registerReceiver(myReceiver, filterReceivedIP);
-		registerReceiver(myReceiver, filterIPDisappeared);
+		//registerReceiver(myReceiver, filterIPDisappeared);
 		picFileList.clear();
 		progressDialog = ProgressDialog.show(context, getString(R.string.progress_dialog_title), getString(R.string.progress_dialog_content), false); //since it might take a while for info to load
 //		getPicfiles(handler); 

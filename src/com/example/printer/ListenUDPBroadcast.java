@@ -11,8 +11,6 @@ import java.nio.charset.Charset;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Message;
 import android.util.Log;
 
 public class ListenUDPBroadcast implements Runnable{
@@ -21,10 +19,10 @@ public class ListenUDPBroadcast implements Runnable{
 	private final int PORT = 7411; 
 	private final String BOARD_ATTRIBUTE = "ANNOU"; 
 	private int counter=0;
-	private static Handler handler;
 //	private final int RECEIVED_IP = 2000; 
 //	private final int IP_DISAPPEARED = 6000;
-	private final String RECEIVED_IP = "printer.com.example.received_ip"; 
+	private final String RECEIVED_IP = "printer.com.example.received_ip";
+	private long gotIPTime = 0; 
 
 /*	
 	public ListenUDPBroadcast(Handler h) {
@@ -73,15 +71,16 @@ public class ListenUDPBroadcast implements Runnable{
 					StringBuilder str = new StringBuilder();
 					for (int value; (value = input.read()) != -1; )
 						str.append((char) value);
-					Log.d("Alex", "str is: "+str); 
+					//Log.d("Alex", "str is: "+str); 
 					boolean check = str.toString().contains(BOARD_ATTRIBUTE); 
 					Log.d("Alex", "check is: "+check);
 					if(check) { //found suitable printer/AP within this network
 						ip = packet.getAddress().getHostAddress();
 						Log.d("Alex", "ip : "+ ip);	
+						gotIPTime = System.currentTimeMillis(); 
 //						Message message = handler.obtainMessage(RECEIVED_IP, ip); //int what, Object obj
 //						handler.sendMessage(message);
-						ResponseCountdown.setFlag(true); 
+//						ResponseCountdown.setFlag(true); 
 						sendReceiveIPBroadcast(ip); 
 					}
 					else { //found UDP packet but not from the suitable printer
@@ -94,6 +93,7 @@ public class ListenUDPBroadcast implements Runnable{
 					e.printStackTrace();
 				}
 				counter++; 
+				Log.d("Alex", "listen gotIPTime! "+gotIPTime);
 			}
 		}
 	}
@@ -105,7 +105,7 @@ public class ListenUDPBroadcast implements Runnable{
 	private void sendReceiveIPBroadcast (String ip){
 		Intent intent = new Intent();
 		intent.setAction(RECEIVED_IP);
-		intent.putExtra("IP", ip); 
+		intent.putExtra("IP", ip);
 		context.sendBroadcast(intent);
 	}
 }

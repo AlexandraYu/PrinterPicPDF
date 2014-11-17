@@ -45,11 +45,12 @@ public class PicViewer extends Activity {
 	private static final int MAX_CHOICE=9; 
 	private static final int MIN_CHOICE=1;
 	private static String ip;
+	private static long time; 
 	private SignalReceiver myReceiver;
 	private final String RECEIVED_IP="printer.com.example.received_ip"; 
-	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
+//	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared";
 	IntentFilter filterReceivedIP = new IntentFilter(RECEIVED_IP);
-	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
+//	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
 	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -78,8 +79,9 @@ public class PicViewer extends Activity {
         switch (item.getItemId()) {
         case R.id.action_print:
             //print action
-        	Log.d("Alex", "what is ip? "+ip); 
-        	if(ip!=null) {
+        	Long currentTime = System.currentTimeMillis(); 
+        	Log.d("xxxx", "what is ip? "+ip); 
+        	if(((currentTime-time) < 10000) && (ip!=null)) {
         		printPicture(ip);
         	}
         	else Toast.makeText(context, R.string.printer_disconnect_warning, Toast.LENGTH_SHORT).show(); 
@@ -113,7 +115,7 @@ public class PicViewer extends Activity {
 			});
 			*/
 		registerReceiver(myReceiver, filterReceivedIP);
-		registerReceiver(myReceiver, filterIPDisappeared);
+//		registerReceiver(myReceiver, filterIPDisappeared);
 	}
 	
 	public static void setPrinterIP(String ipAddress) {
@@ -176,5 +178,10 @@ public class PicViewer extends Activity {
 		AlertDialog alertDialog = alertDialogBuilder.create();
 		alertDialog.show();
 //		printKey.setEnabled(false); 
+	}
+
+	public static void setGotPacketTime(long t) {
+		// TODO Auto-generated method stub
+		time = t; 
 	}
 }
