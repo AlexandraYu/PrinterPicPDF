@@ -198,9 +198,10 @@ public abstract class PdfViewerActivity extends Activity {
 					//send copy to print
 					Log.d("Alex", "PdfViewerActivity, ip is: "+ipAddress);
 					Print print = new Print(context, copy, jobName, ipAddress); 
-					print.runGetPrinterAttributeProcess();
-					print.runValidateJobProcess();
-					print.runPrintJobProcess();
+//					print.runGetPrinterAttributeProcess();
+//					print.runValidateJobProcess();
+//					print.runPrintJobProcess();
+					print.excutePrint();
 					copy=-1; 
 					dialog.cancel();
 				}

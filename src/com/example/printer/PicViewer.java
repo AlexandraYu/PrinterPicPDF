@@ -162,9 +162,10 @@ public class PicViewer extends Activity {
 					Toast.makeText(context, "Print out "+String.valueOf(copy)+" copies", Toast.LENGTH_SHORT).show(); 
 					//send copy to print......
 					Print print = new Print(context, copy, filePath, ipAddress); 
-					print.runGetPrinterAttributeProcess();
-					print.runValidateJobProcess();
-					print.runPrintJobProcess();
+//					print.runGetPrinterAttributeProcess();
+//					print.runValidateJobProcess();
+//					print.runPrintJobProcess();
+					print.excutePrint();
 					copy=-1; 
 					dialog.cancel();
 				}
