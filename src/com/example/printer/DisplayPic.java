@@ -157,7 +157,7 @@ public class DisplayPic extends Activity {
 //		Log.d("Alex", "picFileCr is: "+picFileCr); 
 		if(picFileCr ==null) {
 			Bitmap icon=BitmapFactory.decodeResource(getResources(), R.drawable.emo_im_embarrassed);
-			picFileList.add(new PicFileInfo(getString(R.string.no_pic_found), "", "", icon)); 
+			picFileList.add(new PicFileInfo(getString(R.string.no_pic_found), "0", "", icon)); 
 			listView.setEnabled(false);
 		}
 		if(picFileCr!=null && picFileCr.moveToFirst()){

@@ -153,7 +153,7 @@ public class DisplayPDF extends Activity {
 		String[] selectionArgsPdf = new String[]{ mimeType };
 		Cursor pdfFileCr = pdfFileResolver.query(uri, projection, selectionMimeType, selectionArgsPdf, sortOrder);
 		Log.d("Alex", "pdfFileCr is: "+pdfFileCr);
-		if(pdfFileCr==null) pdfFileList.add(new PDFFileInfo(Integer.toString(R.string.no_pdf_found), "", "")); 
+		if(pdfFileCr==null) pdfFileList.add(new PDFFileInfo(Integer.toString(R.string.no_pdf_found), "0", "")); 
 		if(pdfFileCr!=null && pdfFileCr.moveToFirst()){
 			//get columns
 //			int nameColumn = pdfFileCr.getColumnIndex(OpenableColumns.DISPLAY_NAME);
