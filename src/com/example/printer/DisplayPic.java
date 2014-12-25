@@ -190,8 +190,9 @@ public class DisplayPic extends Activity {
 			while (picFileCr.moveToNext());
 //				Log.d("Alex", "picFileList size is: "+picFileList.size());
 		}
-		
-//		Log.d("Alex", "will return message??");
+		//It's weird... it needs a log here so re-installing this APP without uninstalling it won't have the progress bar blocked the screen?
+		//Otherwise the progress bar won't dismiss and UPDATE_STATUS_COMPLETE will be sent many times??? WTH...
+		Log.d("Alex", "will return message??");
 		Message message = h.obtainMessage(UPDATE_STATUS_COMPLETE);
 		h.sendMessage(message);
 	}
