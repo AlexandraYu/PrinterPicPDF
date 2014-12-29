@@ -48,6 +48,7 @@ public class DisplayPic extends Activity {
 	private SignalReceiver myReceiver; 
 	IntentFilter filterReceivedIP = new IntentFilter(RECEIVED_IP);
 //	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
+	private boolean LOAD_PIC_THREAD_RUNNING=false; 
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,10 +105,14 @@ public class DisplayPic extends Activity {
 		registerReceiver(myReceiver, filterReceivedIP);
 		//registerReceiver(myReceiver, filterIPDisappeared);
 		picFileList.clear();
-		progressDialog = ProgressDialog.show(context, getString(R.string.progress_dialog_title), getString(R.string.progress_dialog_content), false); //since it might take a while for info to load
-//		getPicfiles(handler); 
-		ShowPictureList showPicList = new ShowPictureList(); 
-		new Thread(showPicList). start();
+		if(LOAD_PIC_THREAD_RUNNING==false) {
+			Log.d("Alex", "run thread"); 
+			progressDialog = ProgressDialog.show(context, getString(R.string.progress_dialog_title), getString(R.string.progress_dialog_content), false); //since it might take a while for info to load
+//		getPicfiles(handler); 		
+			ShowPictureList showPicList = new ShowPictureList(); 
+			new Thread(showPicList). start();
+			LOAD_PIC_THREAD_RUNNING=true; 
+		} 
 	}
 	
 	public class ShowPictureList implements Runnable {
@@ -122,6 +127,7 @@ public class DisplayPic extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 				// TODO Auto-generated method stub
+				Log.d("Alex", "clickitem"); 
 				String path=picFileList.get(position).getPath();
 				String name=picFileList.get(position).getName(); 
 //				Toast.makeText(context, path, Toast.LENGTH_SHORT).show();
@@ -272,6 +278,7 @@ public class DisplayPic extends Activity {
 			switch (msg.what) {
 				case UPDATE_STATUS_COMPLETE:
 					Log.d("Alex", "UPDATE_STATUS_COMPLETE"); 
+					LOAD_PIC_THREAD_RUNNING=false;  
 					Collections.sort(picFileList, new Comparator<PicFileInfo>() {
 						public int compare(PicFileInfo a, PicFileInfo b){
 							return a.getName().compareTo(b.getName()); 

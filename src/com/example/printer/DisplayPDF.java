@@ -43,6 +43,7 @@ public class DisplayPDF extends Activity {
 	private final String RECEIVED_IP="printer.com.example.received_ip"; 
 	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
 	private SignalReceiver myReceiver; 
+	private boolean LOAD_PDF_THREAD_RUNNING = false; 
 	IntentFilter filterReceivedIP = new IntentFilter(RECEIVED_IP);
 	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
 	
@@ -97,15 +98,13 @@ public class DisplayPDF extends Activity {
 //		ListenUDPBroadcast.setHandler(handler);
 //		ResponseCountdown.setHandler(handler);
 		pdfFileList.clear();
-		progressDialog = ProgressDialog.show(context, getString(R.string.progress_dialog_title), getString(R.string.progress_dialog_content), false); //since it might take a while for info to load
+		if (LOAD_PDF_THREAD_RUNNING==false) {
+			progressDialog = ProgressDialog.show(context, getString(R.string.progress_dialog_title), getString(R.string.progress_dialog_content), false); //since it might take a while for info to load
 //		getPDFfiles();
-		ShowPDFList showPDFList = new ShowPDFList(); 
-		new Thread(showPDFList). start();
-		/*Collections.sort(pdfFileList, new Comparator<PDFFileInfo>() {
-			public int compare(PDFFileInfo a, PDFFileInfo b){
-				return a.getName().compareTo(b.getName()); 
-			}
-		});*/
+			ShowPDFList showPDFList = new ShowPDFList(); 
+			new Thread(showPDFList). start();
+			LOAD_PDF_THREAD_RUNNING=true;
+		}
 	}
 	
 	public class ShowPDFList implements Runnable {
@@ -253,6 +252,7 @@ public class DisplayPDF extends Activity {
 			switch (msg.what) {
 				case UPDATE_STATUS_COMPLETE:
 					Log.d("Alex", "UPDATE_STATUS_COMPLETE"); 
+					LOAD_PDF_THREAD_RUNNING=false; 
 					Collections.sort(pdfFileList, new Comparator<PDFFileInfo>() {
 						public int compare(PDFFileInfo a, PDFFileInfo b){
 							return a.getName().compareTo(b.getName()); 
