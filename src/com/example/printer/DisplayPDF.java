@@ -176,9 +176,6 @@ public class DisplayPDF extends Activity {
 			while (pdfFileCr.moveToNext());
 				Log.d("Alex", "pdfFileList size is: "+pdfFileList.size());
 			}
-		//As in DisplayPic.java, It's weird... it needs a log here so re-installing this APP without uninstalling it won't have the progress bar blocked the screen?
-		//Otherwise the progress bar won't dismiss and UPDATE_STATUS_COMPLETE will be sent many times??? WTH...
-		Log.d("Alex", "will return message??");
 		Message message = h.obtainMessage(UPDATE_STATUS_COMPLETE);
 		h.sendMessage(message);
 	}
