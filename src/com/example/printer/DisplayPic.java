@@ -49,6 +49,7 @@ public class DisplayPic extends Activity {
 	IntentFilter filterReceivedIP = new IntentFilter(RECEIVED_IP);
 //	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
 	private boolean LOAD_PIC_THREAD_RUNNING=false; 
+	private boolean CLICKED_VIEW_PIC=false; 
 	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,15 +105,18 @@ public class DisplayPic extends Activity {
 //		ResponseCountdown.setHandler(handler);
 		registerReceiver(myReceiver, filterReceivedIP);
 		//registerReceiver(myReceiver, filterIPDisappeared);
-		picFileList.clear();
-		if(LOAD_PIC_THREAD_RUNNING==false) {
+		if (CLICKED_VIEW_PIC ==false) {
+			picFileList.clear();
+		} 
+		if(LOAD_PIC_THREAD_RUNNING==false && CLICKED_VIEW_PIC==false) {
 			Log.d("Alex", "run thread"); 
 			progressDialog = ProgressDialog.show(context, getString(R.string.progress_dialog_title), getString(R.string.progress_dialog_content), false); //since it might take a while for info to load
 //		getPicfiles(handler); 		
 			ShowPictureList showPicList = new ShowPictureList(); 
 			new Thread(showPicList). start();
 			LOAD_PIC_THREAD_RUNNING=true; 
-		} 
+		}
+		CLICKED_VIEW_PIC=false; 
 	}
 	
 	public class ShowPictureList implements Runnable {
@@ -134,6 +138,7 @@ public class DisplayPic extends Activity {
 				Intent viewPicIntent = new Intent(START_PIC_VIEWER_INTENT);
 				viewPicIntent.putExtra("file_path", path);
 				viewPicIntent.putExtra("file_name", name); 
+				CLICKED_VIEW_PIC=true; 
 				startActivity(viewPicIntent);
 			}
 		});

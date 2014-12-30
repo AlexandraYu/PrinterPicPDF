@@ -44,6 +44,7 @@ public class DisplayPDF extends Activity {
 	private final String IP_DISAPPEARED="printer.com.example.ip_disappeared"; 
 	private SignalReceiver myReceiver; 
 	private boolean LOAD_PDF_THREAD_RUNNING = false; 
+	private boolean CLICKED_VIEW_PDF = false; 
 	IntentFilter filterReceivedIP = new IntentFilter(RECEIVED_IP);
 	IntentFilter filterIPDisappeared = new IntentFilter(IP_DISAPPEARED);
 	
@@ -97,19 +98,22 @@ public class DisplayPDF extends Activity {
 		registerReceiver(myReceiver, filterIPDisappeared);
 //		ListenUDPBroadcast.setHandler(handler);
 //		ResponseCountdown.setHandler(handler);
-		pdfFileList.clear();
-		if (LOAD_PDF_THREAD_RUNNING==false) {
+		if (CLICKED_VIEW_PDF==false) {
+			pdfFileList.clear();
+		}
+		if (LOAD_PDF_THREAD_RUNNING==false && CLICKED_VIEW_PDF == false) {
 			progressDialog = ProgressDialog.show(context, getString(R.string.progress_dialog_title), getString(R.string.progress_dialog_content), false); //since it might take a while for info to load
 //		getPDFfiles();
 			ShowPDFList showPDFList = new ShowPDFList(); 
 			new Thread(showPDFList). start();
 			LOAD_PDF_THREAD_RUNNING=true;
 		}
+		CLICKED_VIEW_PDF = false; 
 	}
 	
 	public class ShowPDFList implements Runnable {
 		public void run() {
-			Log.d("Alex", "will call getPDFFiles!"); 
+			Log.d("Alex", "will call getPDFFiles!");
 			getPDFfiles(handler);
 		}
 	}
@@ -125,6 +129,7 @@ public class DisplayPDF extends Activity {
 				Intent viewPDFIntent = new Intent(START_PDF_VIEWER_INTENT);
 				viewPDFIntent.putExtra("file_path", path);
 				viewPDFIntent.putExtra("file_name", name); 
+				CLICKED_VIEW_PDF = true; 
 				startActivity(viewPDFIntent);
 			}
 		});
